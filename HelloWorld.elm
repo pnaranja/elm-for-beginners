@@ -42,6 +42,7 @@ maybeNum = Just 235
 maybeResult = Maybe.map (add 2) maybeNum
 
 type alias Item = {name:String, price:Float, qty:Int, discounted:Bool}
+type alias Item2 = {name:String, qty:Int, freeQty:Int}
 
 cart : List Item
 cart = 
@@ -56,9 +57,25 @@ discount minQty discPct item =
 -- Use composition to combine 10 and 5 quantity discounts
 fiveOrMoreDiscount = discount 10 0.8 << discount 5 0.5
 
-newcart = List.map fiveOrMoreDiscount cart
+cart2 : List Item2
+cart2 =
+    [ {name="Lemon", qty=1, freeQty = 0},
+      {name="Apple", qty=5, freeQty = 0},
+      {name="Pear", qty=11, freeQty = 0}
+      ]
 
-main = Html.text <| toString <| newcart
+freeQuantity: Int -> Int -> Item2 -> Item2
+freeQuantity minQty addQty item =
+    if item.qty >= minQty
+        then {item | freeQty=item.freeQty+addQty}
+        else item
+
+freeQuantities = freeQuantity 10 3 << freeQuantity 5 1
+
+newcart = List.map fiveOrMoreDiscount cart
+newcart2 = List.map freeQuantities cart2
+
+main = Html.text <| toString <| newcart2
 --main = Html.text <| toString <| maybeResult
 --main = Html.text <| toString <| Date.fromString "09/08/1979"
 --main = Html.text <| .name person
