@@ -78,9 +78,10 @@ freeQuantities = freeQuantity 10 3 << freeQuantity 5 1
 newcart = List.map fiveOrMoreDiscount cart
 newcart2 = List.map freeQuantities cart2
 
+-- main : Program Never
 main =
     div
-    [ class "content", id "main-body"]
+    [ style [("background-color", "red")], class "content", id "main-body"]
     [h1 [] [text "Hello World!"], text <| toString <| newcart2]
 
 --main = Html.text <| toString <| newcart2
