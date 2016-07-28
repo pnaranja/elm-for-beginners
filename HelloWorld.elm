@@ -1,5 +1,8 @@
 module Main exposing (..)
-import Html
+
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import String
 import List
 import Date
@@ -75,7 +78,12 @@ freeQuantities = freeQuantity 10 3 << freeQuantity 5 1
 newcart = List.map fiveOrMoreDiscount cart
 newcart2 = List.map freeQuantities cart2
 
-main = Html.text <| toString <| newcart2
+main =
+    div
+    [ class "content", id "main-body"]
+    [h1 [] [text "Hello World!"], text <| toString <| newcart2]
+
+--main = Html.text <| toString <| newcart2
 --main = Html.text <| toString <| maybeResult
 --main = Html.text <| toString <| Date.fromString "09/08/1979"
 --main = Html.text <| .name person
