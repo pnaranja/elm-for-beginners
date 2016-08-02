@@ -7,14 +7,16 @@ import Html.App as App
 import String
 
 
---Model
+--MODEL
 
 
 type Mode a
     = EditPlayer a
     | AddPlayer
 
-type alias PlayerId = Int
+
+type alias PlayerId =
+    Int
 
 
 type alias Model =
@@ -50,7 +52,7 @@ initModel =
 
 
 
---Update
+--UPDATE
 
 
 type Pts
@@ -82,7 +84,7 @@ update msg model =
                 saveModel model
 
         Edit player ->
-            {model | mode = EditPlayer 0}
+            { model | mode = EditPlayer 0 }
 
         _ ->
             model
@@ -98,25 +100,28 @@ saveModel model =
             }
 
         EditPlayer a ->
-            {model | name = "", mode = AddPlayer}
+            { model | name = "", mode = AddPlayer }
+
 
 
 -- To edit a player, you need to change the Player.name and Play.name
-changePlayerNameModel : Player -> Model -> Model
-changePlayerNameModel s m = m
 
-findPlayerNameModel : String -> Model -> Maybe Player
-findPlayerNameModel s model =
-    List.head <| List.filter (\player->player.name == s) model.players
+
+changePlayerNameModel : Player -> Model -> Model
+changePlayerNameModel newplayer model =
+    { model | players = List.map (changePlayerName newplayer.name) model.players }
+
 
 changePlayerName : String -> Player -> Player
-changePlayerName s player = {player | name = s}
+changePlayerName newname player =
+    if player.name == newname then
+        { player | name = newname }
+    else
+        player
 
 
 
-
-
--- View
+-- VIEW
 
 
 view : Model -> Html Msg
@@ -140,10 +145,12 @@ playerForm model =
             []
         , button [ type' "submit" ] [ text "Save" ]
         , button [ type' "button", onClick Cancel ] [ text "Cancel" ]
-
-        -- For debugging EditPlayer
-        , button [ type' "button", onClick (Edit {id=1,name="",totalpoints=1})
-        ] [ text "Edit" ]
+          -- For debugging EditPlayer
+        , button
+            [ type' "button"
+            , onClick (Edit { id = 1, name = "", totalpoints = 1 })
+            ]
+            [ text "Edit" ]
         ]
 
 
