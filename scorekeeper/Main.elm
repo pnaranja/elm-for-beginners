@@ -10,35 +10,37 @@ import String
 --MODEL
 
 
-type Mode a
-    = EditPlayer a
+type Mode id
+    = EditPlayer id
     | AddPlayer
 
 
-type alias PlayerId =
+type alias Id=
     Int
 
+type alias Points =
+    Int
 
 type alias Model =
     { players : List Player
     , name : String
-    , mode : Mode PlayerId
+    , mode : Mode Id
     , plays : List Play
     }
 
 
 type alias Player =
-    { id : Int
+    { id : Id
     , name : String
-    , totalpoints : Int
+    , totalpoints : Points
     }
 
 
 type alias Play =
-    { id : Int
-    , playerId : PlayerId
-    , name : Int
-    , points : Int
+    { id : Id
+    , playerId : Id
+    , name : String
+    , points : Points
     }
 
 
@@ -55,13 +57,9 @@ initModel =
 --UPDATE
 
 
-type Pts
-    = Int
-
-
 type Msg
-    = Edit Player
-    | Score Player Pts
+    = Edit Id
+    | Score Player Points
     | Input String
     | Save
     | Cancel
@@ -83,8 +81,8 @@ update msg model =
             else
                 saveModel model
 
-        Edit player ->
-            { model | mode = EditPlayer 0 }
+        Edit id ->
+            { model | mode = EditPlayer id }
 
         _ ->
             model
@@ -99,22 +97,22 @@ saveModel model =
                 , name = ""
             }
 
-        EditPlayer a ->
-            { model | name = "", mode = AddPlayer }
+        EditPlayer id ->
+            changePlayerNameModel id model
 
 
 
 -- To edit a player, you need to change the Player.name and Play.name
 
 
-changePlayerNameModel : Player -> Model -> Model
-changePlayerNameModel newplayer model =
-    { model | players = List.map (changePlayerName newplayer.name) model.players }
+changePlayerNameModel : Id -> Model -> Model
+changePlayerNameModel id model =
+    { model | players = List.map (changePlayerName id model.name) model.players, name="" }
 
 
-changePlayerName : String -> Player -> Player
-changePlayerName newname player =
-    if player.name == newname then
+changePlayerName : Id -> String -> Player -> Player
+changePlayerName id newname player =
+    if player.id == id then
         { player | name = newname }
     else
         player
@@ -148,7 +146,7 @@ playerForm model =
           -- For debugging EditPlayer
         , button
             [ type' "button"
-            , onClick (Edit { id = 1, name = "", totalpoints = 1 })
+            , onClick (Edit 1)
             ]
             [ text "Edit" ]
         ]
