@@ -15,11 +15,13 @@ type Mode id
     | AddPlayer
 
 
-type alias Id=
+type alias Id =
     Int
+
 
 type alias Points =
     Int
+
 
 type alias Model =
     { players : List Player
@@ -98,16 +100,21 @@ saveModel model =
             }
 
         EditPlayer id ->
-            changePlayerNameModel id model
+            changeNameModel id model
 
 
 
 -- To edit a player, you need to change the Player.name and Play.name
 
 
-changePlayerNameModel : Id -> Model -> Model
-changePlayerNameModel id model =
-    { model | players = List.map (changePlayerName id model.name) model.players, name="" }
+changeNameModel : Id -> Model -> Model
+changeNameModel id model =
+    { model
+        | players = List.map (changePlayerName id model.name) model.players
+        , plays = List.map (changePlayName id model.name) model.plays
+        , name = ""
+        , mode = AddPlayer
+    }
 
 
 changePlayerName : Id -> String -> Player -> Player
@@ -116,6 +123,14 @@ changePlayerName id newname player =
         { player | name = newname }
     else
         player
+
+
+changePlayName : Id -> String -> Play -> Play
+changePlayName id newname play =
+    if play.id == id then
+        { play | name = newname }
+    else
+        play
 
 
 
