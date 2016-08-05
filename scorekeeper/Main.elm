@@ -141,6 +141,7 @@ view : Model -> Html Msg
 view model =
     div [ class "scoreboard" ]
         [ h1 [] [ text "ScoreKeeper" ]
+        , playerSection model
         , playerForm model
         , div [] [ text (toString model) ]
         ]
@@ -166,6 +167,60 @@ playerForm model =
             [ text "Edit" ]
         ]
 
+-- Return a div with 3 sections
+playerSection : Model -> Html Msg
+playerSection model =
+    div []
+    [ playerListHeader
+    , playerList model
+    , pointTotal model
+    ]
+
+playerListHeader : Html Msg
+playerListHeader =
+    header []
+    [ div [] [text "Name"]
+    , div [] [text "Points"]
+    ]
+
+-- ul tag with li tag for each player
+playerList : Model -> Html Msg
+playerList model =
+    ul []
+     (List.map playerListRow model.players)
+
+-- Create a Player List row for the PlayerList
+-- Needs to show:
+ --  icon to edit, the player name, 2/3pts buttons, and the total points
+playerListRow : Player -> Html Msg
+playerListRow player =
+    li []
+    [ i [class "edit"
+        , onClick (Edit player.id)
+        ] []
+     , div []
+        [text player.name]
+     , button [type' "button"
+                , onClick (Score player 2)]
+        [text "2pts"]
+     , button [type' "button"
+                , onClick (Score player 3)]
+        [text "3pts"]
+     , div []
+        [text <| toString player.totalpoints]
+    ]
+
+-- Show total points of all the players
+pointTotal : Model -> Html Msg
+pointTotal model =
+    let totalpts =
+        List.sum <| List.map (\player -> player.totalpoints) model.players
+        
+    in
+       footer [] 
+           [ div [] [text "Total: "]
+            ,div [] [text <| toString totalpts]
+            ]
 
 main : Program Never
 main =
