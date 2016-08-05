@@ -223,6 +223,7 @@ pointTotal model =
             ,div [] [text <| toString totalpts]
             ]
 
+
 main : Program Never
 main =
     App.beginnerProgram { model = initModel, update = update, view = view }
