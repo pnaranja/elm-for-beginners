@@ -167,6 +167,7 @@ playerForm model =
             [ text "Edit" ]
         ]
 
+
 -- Return a div with 3 sections
 playerSection : Model -> Html Msg
 playerSection model =
