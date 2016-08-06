@@ -86,6 +86,9 @@ update msg model =
         Edit id ->
             { model | mode = EditPlayer id }
 
+        Score player pts ->
+            changePtsModel model player pts
+
         _ ->
             model
 
@@ -134,6 +137,31 @@ changePlayName id newname play =
 
 
 
+-- Need to change Player Point total and add a new play to the PlayList
+
+
+changePtsModel : Model -> Player -> Int -> Model
+changePtsModel model player pts =
+    { model
+        | players =
+            List.map
+                (\plyer -> changePlayerPtsIfMatch plyer player pts)
+                model.players
+        , plays =
+            Play (List.length model.plays) player.id player.name pts
+                :: model.plays
+    }
+
+
+changePlayerPtsIfMatch : Player -> Player -> Points -> Player
+changePlayerPtsIfMatch player1 player2 pts =
+    if player1.name == player2.name then
+        { player1 | totalpoints = player1.totalpoints + pts }
+    else
+        player1
+
+
+
 -- VIEW
 
 
@@ -168,61 +196,83 @@ playerForm model =
         ]
 
 
+
 -- Return a div with 3 sections
+
+
 playerSection : Model -> Html Msg
 playerSection model =
     div []
-    [ playerListHeader
-    , playerList model
-    , pointTotal model
-    ]
+        [ playerListHeader
+        , playerList model
+        , pointTotal model
+        ]
+
 
 playerListHeader : Html Msg
 playerListHeader =
     header []
-    [ div [] [text "Name"]
-    , div [] [text "Points"]
-    ]
+        [ div [] [ text "Name" ]
+        , div [] [ text "Points" ]
+        ]
+
+
 
 -- ul tag with li tag for each player
+
+
 playerList : Model -> Html Msg
 playerList model =
-    ul []
-        <| List.map playerListRow
-        <| List.sortBy .name
-        <| model.players
+    ul [] <|
+        List.map playerListRow <|
+            List.sortBy .name <|
+                model.players
+
+
 
 -- Create a Player List row for the PlayerList
 -- Needs to show:
- --  icon to edit, the player name, 2/3pts buttons, and the total points
+--  icon to edit, the player name, 2/3pts buttons, and the total points
+
+
 playerListRow : Player -> Html Msg
 playerListRow player =
     li []
-    [ i [class "edit"
-        , onClick (Edit player.id)
-        ] []
-     , div []
-        [text player.name]
-     , button [type' "button"
-                , onClick (Score player 2)]
-        [text "2pts"]
-     , button [type' "button"
-                , onClick (Score player 3)]
-        [text "3pts"]
-     , div []
-        [text <| toString player.totalpoints]
-    ]
+        [ i
+            [ class "edit"
+            , onClick (Edit player.id)
+            ]
+            []
+        , div []
+            [ text player.name ]
+        , button
+            [ type' "button"
+            , onClick (Score player 2)
+            ]
+            [ text "2pts" ]
+        , button
+            [ type' "button"
+            , onClick (Score player 3)
+            ]
+            [ text "3pts" ]
+        , div []
+            [ text <| toString player.totalpoints ]
+        ]
+
+
 
 -- Show total points of all the players
+
+
 pointTotal : Model -> Html Msg
 pointTotal model =
-    let totalpts =
-        List.sum <| List.map (\player -> player.totalpoints) model.players
-        
+    let
+        totalpts =
+            List.sum <| List.map (\player -> player.totalpoints) model.players
     in
-       footer []
-           [ div [] [text "Total: "]
-            ,div [] [text <| toString totalpts]
+        footer []
+            [ div [] [ text "Total: " ]
+            , div [] [ text <| toString totalpts ]
             ]
 
 
