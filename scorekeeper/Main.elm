@@ -188,7 +188,9 @@ playerListHeader =
 playerList : Model -> Html Msg
 playerList model =
     ul []
-     (List.map playerListRow model.players)
+        <| List.map playerListRow
+        <| List.sortBy .name
+        <| model.players
 
 -- Create a Player List row for the PlayerList
 -- Needs to show:
@@ -218,7 +220,7 @@ pointTotal model =
         List.sum <| List.map (\player -> player.totalpoints) model.players
         
     in
-       footer [] 
+       footer []
            [ div [] [text "Total: "]
             ,div [] [text <| toString totalpts]
             ]
