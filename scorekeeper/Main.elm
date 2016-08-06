@@ -168,20 +168,22 @@ changePlayerPtsIfMatch player1 player2 pts =
 deletePlayModel : Model -> Play -> Model
 deletePlayModel model play =
     let
-        playerOfPlay =
-            List.foldr
-                (\p q ->
-                    if p.name == play.name then
-                        p
+        newplays =
+            List.filter (\p -> p.id /= play.id) model.plays
+
+        newPlayers =
+            List.map
+                (\player ->
+                    if player.name == play.name then
+                        { player | totalpoints = player.totalpoints - play.points }
                     else
-                        q
+                        player
                 )
-                { id = 0, name = "", totalpoints = 0 }
                 model.players
     in
         { model
-            | plays = List.filter (\p -> p.id /= play.id) model.plays
-            , players = List.map (\plyer -> changePlayerPtsIfMatch plyer playerOfPlay (-play.points)) model.players
+            | plays = newplays
+            , players = newPlayers
         }
 
 
