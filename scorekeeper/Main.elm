@@ -10,8 +10,8 @@ import String
 --MODEL
 
 
-type Mode id
-    = EditPlayer id
+type Mode player
+    = EditPlayer player
     | AddPlayer
 
 
@@ -60,7 +60,7 @@ initModel =
 
 
 type Msg
-    = Edit Id
+    = Edit Player
     | Score Player Points
     | Input String
     | Save
@@ -83,8 +83,8 @@ update msg model =
             else
                 saveModel model
 
-        Edit id ->
-            { model | mode = EditPlayer id }
+        Edit player ->
+            { model | name = player.name, mode = EditPlayer player.id }
 
         Score player pts ->
             changePtsModel model player pts
@@ -187,12 +187,6 @@ playerForm model =
             []
         , button [ type' "submit" ] [ text "Save" ]
         , button [ type' "button", onClick Cancel ] [ text "Cancel" ]
-          -- For debugging EditPlayer
-        , button
-            [ type' "button"
-            , onClick (Edit 1)
-            ]
-            [ text "Edit" ]
         ]
 
 
@@ -240,7 +234,7 @@ playerListRow player =
     li []
         [ i
             [ class "edit"
-            , onClick (Edit player.id)
+            , onClick (Edit player)
             ]
             []
         , div []
