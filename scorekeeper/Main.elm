@@ -26,7 +26,7 @@ type alias Points =
 type alias Model =
     { players : List Player
     , name : String
-    , mode : Mode Id
+    , mode : Mode Player
     , plays : List Play
     }
 
@@ -84,13 +84,13 @@ update msg model =
                 saveModel model
 
         Edit player ->
-            { model | name = player.name, mode = EditPlayer player.id }
+            { model | name = player.name, mode = EditPlayer player }
 
         Score player pts ->
             changePtsModel model player pts
 
-        _ ->
-            model
+        Delete play ->
+            deletePlayModel model play
 
 
 saveModel : Model -> Model
@@ -102,19 +102,19 @@ saveModel model =
                 , name = ""
             }
 
-        EditPlayer id ->
-            changeNameModel id model
+        EditPlayer player ->
+            changeNameModel player model
 
 
 
 -- To edit a player, you need to change the Player.name and Play.name
 
 
-changeNameModel : Id -> Model -> Model
-changeNameModel id model =
+changeNameModel : Player -> Model -> Model
+changeNameModel player model =
     { model
-        | players = List.map (changePlayerName id model.name) model.players
-        , plays = List.map (changePlayName id model.name) model.plays
+        | players = List.map (changePlayerName player.id model.name) model.players
+        , plays = List.map (changePlayName player model.name) model.plays
         , name = ""
         , mode = AddPlayer
     }
@@ -128,9 +128,9 @@ changePlayerName id newname player =
         player
 
 
-changePlayName : Id -> String -> Play -> Play
-changePlayName id newname play =
-    if play.id == id then
+changePlayName : Player -> String -> Play -> Play
+changePlayName player newname play =
+    if play.name == player.name then
         { play | name = newname }
     else
         play
@@ -159,6 +159,30 @@ changePlayerPtsIfMatch player1 player2 pts =
         { player1 | totalpoints = player1.totalpoints + pts }
     else
         player1
+
+
+
+-- Delete the play from plays and player's totalpoints
+
+
+deletePlayModel : Model -> Play -> Model
+deletePlayModel model play =
+    let
+        playerOfPlay =
+            List.foldr
+                (\p q ->
+                    if p.name == play.name then
+                        p
+                    else
+                        q
+                )
+                { id = 0, name = "", totalpoints = 0 }
+                model.players
+    in
+        { model
+            | plays = List.filter (\p -> p.id /= play.id) model.plays
+            , players = List.map (\plyer -> changePlayerPtsIfMatch plyer playerOfPlay (-play.points)) model.players
+        }
 
 
 
@@ -299,7 +323,7 @@ playSection model =
 playListRow : Play -> Html Msg
 playListRow play =
     li []
-        [ i [ class "remove" ] []
+        [ i [ class "remove", onClick <| Delete play ] []
         , div []
             [ text play.name ]
         , div []
