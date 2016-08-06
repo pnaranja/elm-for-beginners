@@ -171,22 +171,7 @@ view model =
         [ h1 [] [ text "ScoreKeeper" ]
         , playerSection model
         , playerForm model
-        , div [] [ text (toString model) ]
-        ]
-
-
-playerForm : Model -> Html Msg
-playerForm model =
-    Html.form [ onSubmit Save ]
-        [ input
-            [ type' "text"
-            , placeholder "Add/Edit Player"
-            , onInput Input
-            , value model.name
-            ]
-            []
-        , button [ type' "submit" ] [ text "Save" ]
-        , button [ type' "button", onClick Cancel ] [ text "Cancel" ]
+        , playSection model
         ]
 
 
@@ -268,6 +253,58 @@ pointTotal model =
             [ div [] [ text "Total: " ]
             , div [] [ text <| toString totalpts ]
             ]
+
+
+
+-- To Add/Edit players
+
+
+playerForm : Model -> Html Msg
+playerForm model =
+    Html.form [ onSubmit Save ]
+        [ input
+            [ type' "text"
+            , placeholder "Add/Edit Player"
+            , onInput Input
+            , value model.name
+            ]
+            []
+        , button [ type' "submit" ] [ text "Save" ]
+        , button [ type' "button", onClick Cancel ] [ text "Cancel" ]
+        ]
+
+
+
+-- Show Plays
+
+
+playHeader : Model -> Html Msg
+playHeader model =
+    header []
+        [ div [] [ text "Plays" ]
+        , div [] [ text "Points" ]
+        ]
+
+
+playSection : Model -> Html Msg
+playSection model =
+    div []
+        [ playHeader model
+        , ul [] <|
+            List.map playListRow <|
+                model.plays
+        ]
+
+
+playListRow : Play -> Html Msg
+playListRow play =
+    li []
+        [ i [ class "remove" ] []
+        , div []
+            [ text play.name ]
+        , div []
+            [ text <| toString play.points ]
+        ]
 
 
 main : Program Never
