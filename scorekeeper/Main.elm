@@ -15,6 +15,11 @@ type Mode player
     | AddPlayer
 
 
+type PlayerSelect
+    = Select
+    | NotSelect
+
+
 type alias Id =
     Int
 
@@ -35,6 +40,7 @@ type alias Player =
     { id : Id
     , name : String
     , totalpoints : Points
+    , select : PlayerSelect
     }
 
 
@@ -84,7 +90,7 @@ update msg model =
                 saveModel model
 
         Edit player ->
-            { model | name = player.name, mode = EditPlayer player }
+            editModeModelHighlight player model
 
         Score player pts ->
             changePtsModel model player pts
@@ -98,12 +104,32 @@ saveModel model =
     case model.mode of
         AddPlayer ->
             { model
-                | players = (Player (List.length model.players) model.name 0) :: model.players
+                | players = (Player (List.length model.players) model.name 0 NotSelect) :: model.players
                 , name = ""
             }
 
         EditPlayer player ->
             changeNameModel player model
+
+
+editModeModelHighlight : Player -> Model -> Model
+editModeModelHighlight player model =
+    let
+        newPlayers =
+            List.map
+                (\p ->
+                    if p.name == player.name then
+                        { p | select = Select }
+                    else
+                        p
+                )
+                model.players
+    in
+        { model
+            | name = player.name
+            , mode = EditPlayer player
+            , players = newPlayers
+        }
 
 
 
@@ -113,17 +139,17 @@ saveModel model =
 changeNameModel : Player -> Model -> Model
 changeNameModel player model =
     { model
-        | players = List.map (changePlayerName player.id model.name) model.players
+        | players = List.map (changePlayerNameSelect player.id model.name) model.players
         , plays = List.map (changePlayName player model.name) model.plays
         , name = ""
         , mode = AddPlayer
     }
 
 
-changePlayerName : Id -> String -> Player -> Player
-changePlayerName id newname player =
+changePlayerNameSelect : Id -> String -> Player -> Player
+changePlayerNameSelect id newname player =
     if player.id == id then
-        { player | name = newname }
+        { player | name = newname, select = NotSelect }
     else
         player
 
@@ -198,6 +224,7 @@ view model =
         , playerSection model
         , playerForm model
         , playSection model
+        , div [] [ text <| toString model ]
         ]
 
 
@@ -235,6 +262,18 @@ playerList model =
 
 
 
+-- Add CSS style for edit selects
+
+
+editSelect : Player -> Attribute Msg
+editSelect player =
+    if player.select == Select then
+        style [ ( "backgroundColor", "LightSkyBlue" ) ]
+    else
+        style [ ( "backgroundColor", "White" ) ]
+
+
+
 -- Create a Player List row for the PlayerList
 -- Needs to show:
 --  icon to edit, the player name, 2/3pts buttons, and the total points
@@ -248,7 +287,7 @@ playerListRow player =
             , onClick (Edit player)
             ]
             []
-        , div []
+        , div [ editSelect player ]
             [ text player.name ]
         , button
             [ type' "button"
