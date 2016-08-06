@@ -224,7 +224,6 @@ view model =
         , playerSection model
         , playerForm model
         , playSection model
-        , div [] [ text <| toString model ]
         ]
 
 
