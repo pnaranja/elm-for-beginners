@@ -1,4 +1,4 @@
-module ScoreKeeper exposing (..)
+module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

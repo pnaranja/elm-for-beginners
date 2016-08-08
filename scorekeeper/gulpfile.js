@@ -8,7 +8,7 @@ var gulp = require('gulp'),
   clear = require('clear'),
   counter = 0;
 
-var cmd = 'elm make ./Main.elm --output ./bundle.js';
+var cmd = 'elm make src/ScoreKeeper.elm --output ./bundle.js';
 clear();
 gulp.task('default', ['server', 'watch', 'elm']);
 
