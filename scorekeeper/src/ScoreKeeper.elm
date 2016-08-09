@@ -1,4 +1,4 @@
-module Main exposing (..)
+module ScoreKeeper exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -237,6 +237,7 @@ playerSection model =
         [ playerListHeader
         , playerList model
         , pointTotal model
+        , div [] [text <| toString model]
         ]
 
 
